@@ -83,7 +83,7 @@
     "sd_vae_as_default": true,
     "sd_unet": "Automatic",
     "inpainting_mask_weight": 1.0,
-    "initial_noise_multiplier": 1.0,
+    "initial_noise_multiplier": 0.0,
     "img2img_color_correction": false,
     "img2img_fix_steps": false,
     "img2img_background_color": "#ffffff",
