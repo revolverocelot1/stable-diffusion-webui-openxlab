@@ -1,6 +1,6 @@
 import os
 os.chdir(f"/home/xlab-app-center")
-os.system(f"git clone -b v2.5 https://github.com/camenduru/stable-diffusion-webui /home/xlab-app-center/stable-diffusion-webui")
+os.system(f"git clone -b v2.6 https://github.com/camenduru/stable-diffusion-webui /home/xlab-app-center/stable-diffusion-webui")
 os.chdir(f"/home/xlab-app-center/stable-diffusion-webui")
 os.system(f"git clone https://github.com/etherealxx/batchlinks-webui /home/xlab-app-center/stable-diffusion-webui/extensions/batchlinks-webui")
 os.system(f"git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui-nsfw-censor /home/xlab-app-center/stable-diffusion-webui/extensions/stable-diffusion-webui-nsfw-censor")
@@ -83,8 +83,8 @@ os.system(f"sed -i -e '253,258d' /home/xlab-app-center/stable-diffusion-webui/mo
 os.system(f"sed -i -e '186,228d' /home/xlab-app-center/stable-diffusion-webui/modules/ui_settings.py")
 os.system(f"sed -i -e '171,178d' /home/xlab-app-center/stable-diffusion-webui/modules/ui_settings.py")
 os.system(f"sed -i -e '108,113d' /home/xlab-app-center/stable-diffusion-webui/modules/ui_settings.py")
-os.system(f"sed -i -e '208,210d' /home/xlab-app-center/stable-diffusion-webui/modules/ui_loadsave.py")
-os.system(f"sed -i -e '197,200d' /home/xlab-app-center/stable-diffusion-webui/modules/ui_loadsave.py")
+os.system(f"sed -i -e '225,227d' /home/xlab-app-center/stable-diffusion-webui/modules/ui_loadsave.py")
+os.system(f"sed -i -e '214,217d' /home/xlab-app-center/stable-diffusion-webui/modules/ui_loadsave.py")
 os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://civitai.com/api/download/models/130072 -d /home/xlab-app-center/stable-diffusion-webui/models/Stable-diffusion -o realisticVisionV51_v51VAE.safetensors")
 os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://civitai.com/api/download/models/142219 -d /home/xlab-app-center/stable-diffusion-webui/models/Stable-diffusion -o x-men cyclops man 1a-000025.safetensors")
 os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://civitai.com/api/download/models/128713 -d /home/xlab-app-center/stable-diffusion-webui/models/Stable-diffusion -o dreamshaper_8.safetensors")
