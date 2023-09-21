@@ -1,6 +1,7 @@
 import os
 os.system(f"apt search nvidia-driver")
-os.system(f"sudo apt install nvidia-driver-525 nvidia-dkms-525 -y")
+# os.system(f"sudo apt install nvidia-driver-525 nvidia-dkms-525 -y")
+os.system(f"apt install nvidia-driver-525 nvidia-dkms-525 -y")
 os.chdir(f"/home/xlab-app-center")
 os.system(f"git clone -b v2.6 https://github.com/camenduru/stable-diffusion-webui /home/xlab-app-center/stable-diffusion-webui")
 os.chdir(f"/home/xlab-app-center/stable-diffusion-webui")
