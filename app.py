@@ -1,5 +1,5 @@
 import os
-# os.system(f"pip install accelerate==0.2.1") 
+# os.system(f"pip install accelerate==0.23.0") 
 os.system(f"apt search nvidia-driver")
 # os.system(f"sudo apt install nvidia-driver-525 nvidia-dkms-525 -y")
 os.system(f"apt install nvidia-driver-525 nvidia-dkms-525 -y")
