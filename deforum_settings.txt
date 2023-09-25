@@ -184,7 +184,7 @@
     "cn_3_overwrite_frames": true,
     "cn_3_vid_path": "",
     "cn_3_mask_vid_path": "",
-    "cn_3_enabled": true,
+    "cn_3_enabled": false,
     "cn_3_low_vram": false,
     "cn_3_pixel_perfect": true,
     "cn_3_module": "none",
