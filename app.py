@@ -3,6 +3,7 @@ import os
 os.system(f"apt search nvidia-driver")
 # os.system(f"sudo apt install nvidia-driver-535 nvidia-dkms-535 -y")
 os.system(f"apt install nvidia-driver-535-server nvidia-dkms-535-server -y")
+os.system(f"sudo apt --fix-broken install -y")
 os.chdir(f"/home/xlab-app-center")
 os.system(f"git clone -b v2.6 https://github.com/camenduru/stable-diffusion-webui /home/xlab-app-center/stable-diffusion-webui")
 os.chdir(f"/home/xlab-app-center/stable-diffusion-webui")
