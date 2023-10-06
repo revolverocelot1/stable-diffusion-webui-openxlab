@@ -108,4 +108,5 @@ os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://civita
 # os.system(f"accelerate config default")
 # os.system(f"accelerate launch launch.py --opt-sdp-no-mem-attention --opt-channelslast --enable-insecure-extension-access --gradio-img2img-tool color-sketch --theme dark --disable-safe-unpickle --ui-settings-file /home/xlab-app-center/config.json --ui-config-file /home/xlab-app-center/ui-config.json")
 # os.system(f"python launch.py --opt-sdp-no-mem-attention --opt-channelslast --enable-insecure-extension-access --gradio-img2img-tool color-sketch --theme dark --disable-safe-unpickle --ui-settings-file /home/xlab-app-center/config.json --ui-config-file /home/xlab-app-center/ui-config.json")
+os.system(f"pip install --upgrade gradio")
 os.system(f"bash webui.sh --opt-sdp-no-mem-attention --opt-channelslast --enable-insecure-extension-access --gradio-img2img-tool color-sketch --theme dark --disable-safe-unpickle --ui-settings-file /home/xlab-app-center/config.json --ui-config-file /home/xlab-app-center/ui-config.json")
