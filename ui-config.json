@@ -38,7 +38,7 @@
     "txt2img/Sampling steps/visible": true,
     "txt2img/Sampling steps/value": 20,
     "txt2img/Sampling steps/minimum": 1,
-    "txt2img/Sampling steps/maximum": 150,
+    "txt2img/Sampling steps/maximum": 100,
     "txt2img/Sampling steps/step": 1,
     "txt2img/Restore faces/visible": true,
     "txt2img/Restore faces/value": false,
