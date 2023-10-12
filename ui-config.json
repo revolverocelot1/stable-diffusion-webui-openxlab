@@ -98,7 +98,7 @@
     "txt2img/Batch size/visible": true,
     "txt2img/Batch size/value": 1,
     "txt2img/Batch size/minimum": 1,
-    "txt2img/Batch size/maximum": 8,
+    "txt2img/Batch size/maximum": 3,
     "txt2img/Batch size/step": 1,
     "txt2img/CFG Scale/visible": true,
     "txt2img/CFG Scale/value": 7.0,
