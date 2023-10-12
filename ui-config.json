@@ -263,7 +263,7 @@
     "img2img/Sampling steps/visible": true,
     "img2img/Sampling steps/value": 20,
     "img2img/Sampling steps/minimum": 1,
-    "img2img/Sampling steps/maximum": 150,
+    "img2img/Sampling steps/maximum": 100,
     "img2img/Sampling steps/step": 1,
     "img2img/Restore faces/visible": true,
     "img2img/Restore faces/value": false,
