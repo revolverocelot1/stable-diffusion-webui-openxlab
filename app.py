@@ -14,7 +14,7 @@ os.system(f"sed -i -e '214,217d' /home/xlab-app-center/stable-diffusion-webui/mo
 # extenstions
 os.system(f"git clone https://github.com/mcmonkeyprojects/sd-dynamic-thresholding /home/xlab-app-center/stable-diffusion-webui/extensions/sd-dynamic-thresholding")
 os.system(f"git clone https://github.com/Mikubill/sd-webui-controlnet /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-controlnet")
-os.system(f"git clone https://github.com/camenduru/sd-civitai-browser /home/xlab-app-center/stable-diffusion-webui/extensions/sd-civitai-browser")
+
 os.system(f"git clone https://github.com/LonicaMewinsky/gif2gif /home/xlab-app-center/stable-diffusion-webui/extensions/gif2gif")
 os.system(f"git clone https://github.com/zanllp/sd-webui-infinite-image-browsing /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-infinite-image-browsing")
 os.system(f"git clone https://github.com/BlafKing/sd-civitai-browser-plus /home/xlab-app-center/stable-diffusion-webui/extensions/sd-civitai-browser-plus")
