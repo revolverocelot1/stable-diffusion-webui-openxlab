@@ -16,8 +16,8 @@ os.system(f"git clone https://github.com/Mikubill/sd-webui-controlnet /home/xlab
 os.system(f"git clone https://github.com/camenduru/sd-civitai-browser /home/xlab-app-center/stable-diffusion-webui/extensions/sd-civitai-browser")
 os.system(f"git clone https://github.com/LonicaMewinsky/gif2gif /home/xlab-app-center/stable-diffusion-webui/extensions/gif2gif")
 os.system(f"git clone https://github.com/zanllp/sd-webui-infinite-image-browsing /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-infinite-image-browsing")
-# os.system(f"git clone https://github.com/P2Enjoy/sd-webui-roop-uncensored /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-roop-uncensored")
-# os.system(f"git clone https://github.com/Gourieff/sd-webui-reactor /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-reactor")
+os.system(f"git clone https://github.com/P2Enjoy/sd-webui-roop-uncensored /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-roop-uncensored")
+os.system(f"git clone https://github.com/Gourieff/sd-webui-reactor /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-reactor")
 
 #model cn
 # os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11e_sd15_ip2p_fp16.safetensors -d /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-controlnet/models -o control_v11e_sd15_ip2p_fp16.safetensors")
