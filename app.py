@@ -14,10 +14,11 @@ os.system(f"sed -i -e '214,217d' /home/xlab-app-center/stable-diffusion-webui/mo
 # extenstions
 os.system(f"git clone https://github.com/mcmonkeyprojects/sd-dynamic-thresholding /home/xlab-app-center/stable-diffusion-webui/extensions/sd-dynamic-thresholding")
 os.system(f"git clone https://github.com/Mikubill/sd-webui-controlnet /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-controlnet")
-
+os.system(f"git clone https://github.com/P2Enjoy/sd-webui-roop-uncensored /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-roop-uncensored")
 os.system(f"git clone https://github.com/LonicaMewinsky/gif2gif /home/xlab-app-center/stable-diffusion-webui/extensions/gif2gif")
 os.system(f"git clone https://github.com/zanllp/sd-webui-infinite-image-browsing /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-infinite-image-browsing")
 os.system(f"git clone https://github.com/BlafKing/sd-civitai-browser-plus /home/xlab-app-center/stable-diffusion-webui/extensions/sd-civitai-browser-plus")
+os.system(f"git clone https://github.com/Iyashinouta/sd-model-downloader /home/xlab-app-center/stable-diffusion-webui/extensions/sd-model-downloader")
 
 os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/SG161222/Realistic_Vision_V5.1_noVAE/resolve/main/Realistic_Vision_V5.1_fp16-no-ema.safetensors -d /home/xlab-app-center/stable-diffusion-webui/models/Stable-diffusion -o Realistic_Vision_V5.1_fp16-no-ema.safetensors")
 #model cn
