@@ -20,8 +20,8 @@ os.system(f"git clone https://github.com/zanllp/sd-webui-infinite-image-browsing
 os.system(f"git clone https://github.com/revolverocelot1/sd-civitai-browser-plus/tree/main /home/xlab-app-center/stable-diffusion-webui/extensions/sd-civitai-browser-plus")
 os.system(f"git clone https://github.com/djbielejeski/a-person-mask-generator.git /home/xlab-app-center/stable-diffusion-webui/extensions/a-person-mask-generator")
 os.system(f"git clone https://github.com/DominikDoom/a1111-sd-webui-tagcomplete /home/xlab-app-center/stable-diffusion-webui/extensions/a1111-sd-webui-tagcomplete")
-os.system(f"git clone https://github.com/huchenlei/adetailer /home/xlab-app-center/stable-diffusion-webui/extensions/adetailer")
-os.system(f"git clone https://github.com/Iyashinouta/sd-model-downloader /home/xlab-app-center/stable-diffusion-webui/extensions/sd-model-downloader")
+os.system(f"git clone https://github.com/kostenickj/adetailer /home/xlab-app-center/stable-diffusion-webui/extensions/adetailer")
+os.system(f"git clone https://github.com/etherealxx/batchlinks-webui /home/xlab-app-center/stable-diffusion-webui/extensions/batchlinks-webui")
 
 os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/SG161222/Realistic_Vision_V5.1_noVAE/resolve/main/Realistic_Vision_V5.1_fp16-no-ema.safetensors -d /home/xlab-app-center/stable-diffusion-webui/models/Stable-diffusion -o Realistic_Vision_V5.1_fp16-no-ema.safetensors")
 #model cn
