@@ -17,7 +17,7 @@ os.system(f"git clone https://github.com/Mikubill/sd-webui-controlnet /home/xlab
 os.system(f"git clone https://github.com/P2Enjoy/sd-webui-roop-uncensored /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-roop-uncensored")
 os.system(f"git clone https://github.com/LonicaMewinsky/gif2gif /home/xlab-app-center/stable-diffusion-webui/extensions/gif2gif")
 os.system(f"git clone https://github.com/zanllp/sd-webui-infinite-image-browsing /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-infinite-image-browsing")
-os.system(f"git clone https://github.com/revolverocelot1/sd-civitai-browser-plus/tree/main /home/xlab-app-center/stable-diffusion-webui/extensions/sd-civitai-browser-plus")
+os.system(f"git clone https://github.com/revolverocelot1/sd-civitai-browser-plus.git /home/xlab-app-center/stable-diffusion-webui/extensions/sd-civitai-browser-plus")
 os.system(f"git clone https://github.com/djbielejeski/a-person-mask-generator.git /home/xlab-app-center/stable-diffusion-webui/extensions/a-person-mask-generator")
 os.system(f"git clone https://github.com/DominikDoom/a1111-sd-webui-tagcomplete /home/xlab-app-center/stable-diffusion-webui/extensions/a1111-sd-webui-tagcomplete")
 os.system(f"git clone https://github.com/kostenickj/adetailer /home/xlab-app-center/stable-diffusion-webui/extensions/adetailer")
