@@ -22,6 +22,8 @@ os.system(f"git clone https://github.com/djbielejeski/a-person-mask-generator.gi
 os.system(f"git clone https://github.com/DominikDoom/a1111-sd-webui-tagcomplete /home/xlab-app-center/stable-diffusion-webui/extensions/a1111-sd-webui-tagcomplete")
 os.system(f"git clone https://github.com/kostenickj/adetailer /home/xlab-app-center/stable-diffusion-webui/extensions/adetailer")
 os.system(f"git clone https://github.com/etherealxx/batchlinks-webui /home/xlab-app-center/stable-diffusion-webui/extensions/batchlinks-webui")
+os.system(f"git clone https://github.com/Haoming02/sd-webui-resharpen /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-resharpen")
+os.system(f"git clone https://github.com/Haoming02/sd-webui-old-photo-restoration /home/xlab-app-center/stable-diffusion-webui/extensions/sd-webui-old-photo-restoration")
 
 
 #model cn
