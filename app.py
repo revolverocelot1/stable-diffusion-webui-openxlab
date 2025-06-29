@@ -46,6 +46,29 @@ def clone_forge():
     # Install git lfs
     run_command("git lfs install")
 
+    # FIX: Patch the launch script to use a Gitee mirror for assets
+    print("Patching launch script to use Gitee mirror for assets...")
+    launch_utils_path = "/home/xlab-app-center/stable-diffusion-webui-forge/modules/launch_utils.py"
+    if os.path.exists(launch_utils_path):
+        try:
+            with open(launch_utils_path, 'r+', encoding='utf-8') as f:
+                content = f.read()
+                github_url = "https://github.com/AUTOMATIC1111/stable-diffusion-webui-assets.git"
+                gitee_url = "https://gitee.com/yfork/stable-diffusion-webui-assets.git"
+                
+                if github_url in content:
+                    content = content.replace(github_url, gitee_url)
+                    f.seek(0)
+                    f.write(content)
+                    f.truncate()
+                    print("✅ Successfully patched launch_utils.py")
+                else:
+                    print("☑️ Asset repository URL already patched or not found.")
+        except Exception as e:
+            print(f"⚠️ Could not patch launch_utils.py: {e}")
+    else:
+        print(f"⚠️ {launch_utils_path} not found, cannot patch asset repository.")
+
 def setup_config_files():
     """Setup configuration files without breaking the code"""
     print("Setting up configuration files...")
