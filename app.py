@@ -10,6 +10,7 @@ import subprocess
 import json
 import time
 from pathlib import Path
+import requests
 
 def run_command(cmd, check=True, shell=True):
     """Run command with better error handling"""
@@ -123,94 +124,61 @@ def setup_extensions():
             print(f"{dir_name} already exists, skipping...")
 
 def download_models():
-    """Download essential models using reliable sources with fallbacks"""
+    """Download essential models using the OpenXLab API for reliable links."""
     print("Downloading models...")
     
-    # Create model directories
     model_dirs = [
-        "models/Stable-diffusion",
-        "models/VAE",
-        "extensions/sd-webui-controlnet/models"
+        "models/Stable-diffusion", "models/VAE", "extensions/sd-webui-controlnet/models"
     ]
-    
     for dir_path in model_dirs:
         os.makedirs(dir_path, exist_ok=True)
-    
-    # Essential models with reliable URLs and fallbacks
-    models = [
-        # Main SD model - using Hugging Face as primary source
-        {
-            "urls": [
-                "https://huggingface.co/SG161222/Realistic_Vision_V5.1_noVAE/resolve/main/Realistic_Vision_V5.1_fp16-no-ema.safetensors",
-                "https://civitai.com/api/download/models/130072",
-                "https://download.openxlab.org.cn/models/ninjawick/realistic-vision-5.1/weight/realisticVisionV51_v51VAE.safetensors"
-            ],
-            "path": "models/Stable-diffusion/realisticVisionV51_v51VAE.safetensors"
-        },
-        # Essential ControlNet models from Hugging Face
-        {
-            "urls": [
-                "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11f1p_sd15_depth.pth",
-                "https://download.openxlab.org.cn/models/prajjwal1/ControlNet-v1-1/weight/control_v11f1p_sd15_depth.pth"
-            ],
-            "path": "extensions/sd-webui-controlnet/models/control_v11f1p_sd15_depth.pth"
-        },
-        {
-            "urls": [
-                "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_openpose.pth",
-                "https://download.openxlab.org.cn/models/prajjwal1/ControlNet-v1-1/weight/control_v11p_sd15_openpose.pth"
-            ],
-            "path": "extensions/sd-webui-controlnet/models/control_v11p_sd15_openpose.pth"
-        },
-        {
-            "urls": [
-                "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11f1e_sd15_tile.pth",
-                "https://download.openxlab.org.cn/models/prajjwal1/ControlNet-v1-1/weight/control_v11f1e_sd15_tile.pth"
-            ],
-            "path": "extensions/sd-webui-controlnet/models/control_v11f1e_sd15_tile.pth"
-        }
+
+    models_to_download = [
+        {"repo": "ninjawick/realistic-vision-5.1", "file": "realisticVisionV51_v51VAE.safetensors", "path": "models/Stable-diffusion"},
+        {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11f1p_sd15_depth.pth", "path": "extensions/sd-webui-controlnet/models"},
+        {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11p_sd15_openpose.pth", "path": "extensions/sd-webui-controlnet/models"},
+        {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11f1e_sd15_tile.pth", "path": "extensions/sd-webui-controlnet/models"}
     ]
-    
-    # Download models with fallback URLs
-    for model in models:
-        if not os.path.exists(model["path"]):
-            print(f"Downloading {os.path.basename(model['path'])}...")
-            success = False
+
+    for model in models_to_download:
+        dest_path = os.path.join(model["path"], model["file"])
+        if os.path.exists(dest_path):
+            print(f"✅ {model['file']} already exists, skipping...")
+            continue
             
-            for url in model["urls"]:
-                try:
-                    print(f"Trying URL: {url}")
-                    
-                    # Try aria2c first
-                    cmd = f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false --max-tries=3 --retry-wait=5 '{url}' -d '{os.path.dirname(model['path'])}' -o '{os.path.basename(model['path'])}'"
-                    result = run_command(cmd, check=False)
-                    
-                    if result.returncode == 0 and os.path.exists(model["path"]):
-                        print(f"✅ Successfully downloaded {os.path.basename(model['path'])} with aria2c")
-                        success = True
-                        break
-                    else:
-                        print(f"❌ aria2c failed for {url}, trying wget...")
-                        
-                        # Fallback to wget
-                        wget_cmd = f"wget -c -t 3 -T 30 '{url}' -O '{model['path']}'"
-                        wget_result = run_command(wget_cmd, check=False)
-                        
-                        if wget_result.returncode == 0 and os.path.exists(model["path"]):
-                            print(f"✅ Successfully downloaded {os.path.basename(model['path'])} with wget")
-                            success = True
-                            break
-                        else:
-                            print(f"❌ wget also failed for {url}")
-                        
-                except Exception as e:
-                    print(f"❌ Error downloading from {url}: {e}")
-                    continue
+        print(f"⬇️  Fetching download URL for {model['file']}...")
+        try:
+            # Get the repo ID from the name
+            repo_id_url = "https://openxlab.org.cn/gw/model-center/api/v1/repository/getRepoDetailByName"
+            repo_res = requests.post(repo_id_url, json={"repoName": model["repo"]})
+            repo_res.raise_for_status()
+            repo_id = repo_res.json().get("data", {}).get("id")
+
+            if not repo_id:
+                raise Exception(f"Could not get repo ID for {model['repo']}")
+
+            # Get the file download URL
+            files_url = "https://openxlab.org.cn/gw/model-center/api/v1/repository/getRepoPageFiles"
+            files_res = requests.post(files_url, json={"repoId": repo_id, "page_size": 100})
+            files_res.raise_for_status()
             
-            if not success:
-                print(f"⚠️ Failed to download {os.path.basename(model['path'])} from all sources. WebUI will download it automatically when needed.")
-        else:
-            print(f"✅ {os.path.basename(model['path'])} already exists, skipping...")
+            download_url = None
+            for f in files_res.json().get("data", {}).get("list", []):
+                if f.get("name") == model["file"]:
+                    download_url = f.get("downloadUrl")
+                    break
+            
+            if not download_url:
+                raise Exception(f"Could not find download URL for {model['file']}")
+
+            print(f"Downloading {model['file']}...")
+            cmd = f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false '{download_url}' -d '{model['path']}' -o '{model['file']}'"
+            run_command(cmd, check=True)
+            print(f"✅ Successfully downloaded {model['file']}")
+
+        except Exception as e:
+            print(f"❌ Failed to download {model['file']}: {e}")
+            print("WebUI may attempt to download this model on its own if needed.")
 
 def create_launch_config():
     """Create optimized launch configuration"""
