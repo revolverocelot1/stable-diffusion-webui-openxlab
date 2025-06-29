@@ -123,7 +123,7 @@ def setup_extensions():
             print(f"{dir_name} already exists, skipping...")
 
 def download_models():
-    """Download essential models using faster mirrors"""
+    """Download essential models using reliable sources with fallbacks"""
     print("Downloading models...")
     
     # Create model directories
@@ -136,36 +136,81 @@ def download_models():
     for dir_path in model_dirs:
         os.makedirs(dir_path, exist_ok=True)
     
-    # Essential models with faster downloads - URLs replaced with reliable OpenXLab mirrors
+    # Essential models with reliable URLs and fallbacks
     models = [
-        # Main SD model
+        # Main SD model - using Hugging Face as primary source
         {
-            "url": "https://download.openxlab.org.cn/models/ninjawick/realistic-vision-5.1/weight/realisticVisionV51_v51VAE.safetensors",
+            "urls": [
+                "https://huggingface.co/SG161222/Realistic_Vision_V5.1_noVAE/resolve/main/Realistic_Vision_V5.1_fp16-no-ema.safetensors",
+                "https://civitai.com/api/download/models/130072",
+                "https://download.openxlab.org.cn/models/ninjawick/realistic-vision-5.1/weight/realisticVisionV51_v51VAE.safetensors"
+            ],
             "path": "models/Stable-diffusion/realisticVisionV51_v51VAE.safetensors"
         },
-        # Essential ControlNet models from OpenXLab mirrors
+        # Essential ControlNet models from Hugging Face
         {
-            "url": "https://download.openxlab.org.cn/models/prajjwal1/ControlNet-v1-1/weight/control_v11f1p_sd15_depth.pth",
+            "urls": [
+                "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11f1p_sd15_depth.pth",
+                "https://download.openxlab.org.cn/models/prajjwal1/ControlNet-v1-1/weight/control_v11f1p_sd15_depth.pth"
+            ],
             "path": "extensions/sd-webui-controlnet/models/control_v11f1p_sd15_depth.pth"
         },
         {
-            "url": "https://download.openxlab.org.cn/models/prajjwal1/ControlNet-v1-1/weight/control_v11p_sd15_openpose.pth",
+            "urls": [
+                "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_openpose.pth",
+                "https://download.openxlab.org.cn/models/prajjwal1/ControlNet-v1-1/weight/control_v11p_sd15_openpose.pth"
+            ],
             "path": "extensions/sd-webui-controlnet/models/control_v11p_sd15_openpose.pth"
         },
         {
-            "url": "https://download.openxlab.org.cn/models/prajjwal1/ControlNet-v1-1/weight/control_v11f1e_sd15_tile.pth",
+            "urls": [
+                "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11f1e_sd15_tile.pth",
+                "https://download.openxlab.org.cn/models/prajjwal1/ControlNet-v1-1/weight/control_v11f1e_sd15_tile.pth"
+            ],
             "path": "extensions/sd-webui-controlnet/models/control_v11f1e_sd15_tile.pth"
         }
     ]
     
-    # Download models if they don't exist
+    # Download models with fallback URLs
     for model in models:
         if not os.path.exists(model["path"]):
             print(f"Downloading {os.path.basename(model['path'])}...")
-            cmd = f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false '{model['url']}' -d '{os.path.dirname(model['path'])}' -o '{os.path.basename(model['path'])}'"
-            run_command(cmd, check=False)
+            success = False
+            
+            for url in model["urls"]:
+                try:
+                    print(f"Trying URL: {url}")
+                    
+                    # Try aria2c first
+                    cmd = f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false --max-tries=3 --retry-wait=5 '{url}' -d '{os.path.dirname(model['path'])}' -o '{os.path.basename(model['path'])}'"
+                    result = run_command(cmd, check=False)
+                    
+                    if result.returncode == 0 and os.path.exists(model["path"]):
+                        print(f"✅ Successfully downloaded {os.path.basename(model['path'])} with aria2c")
+                        success = True
+                        break
+                    else:
+                        print(f"❌ aria2c failed for {url}, trying wget...")
+                        
+                        # Fallback to wget
+                        wget_cmd = f"wget -c -t 3 -T 30 '{url}' -O '{model['path']}'"
+                        wget_result = run_command(wget_cmd, check=False)
+                        
+                        if wget_result.returncode == 0 and os.path.exists(model["path"]):
+                            print(f"✅ Successfully downloaded {os.path.basename(model['path'])} with wget")
+                            success = True
+                            break
+                        else:
+                            print(f"❌ wget also failed for {url}")
+                        
+                except Exception as e:
+                    print(f"❌ Error downloading from {url}: {e}")
+                    continue
+            
+            if not success:
+                print(f"⚠️ Failed to download {os.path.basename(model['path'])} from all sources. WebUI will download it automatically when needed.")
         else:
-            print(f"{os.path.basename(model['path'])} already exists, skipping...")
+            print(f"✅ {os.path.basename(model['path'])} already exists, skipping...")
 
 def create_launch_config():
     """Create optimized launch configuration"""

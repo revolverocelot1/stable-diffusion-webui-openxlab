@@ -1,17 +1,17 @@
 # Updated requirements for Stable Diffusion WebUI Forge
 # Optimized for OpenXLab deployment
 
-# Core PyTorch (updated versions)
+# Core PyTorch (updated to 2.3+ for better optimizations)
 --extra-index-url https://download.pytorch.org/whl/cu118
-torch==2.1.0+cu118
-torchvision==0.16.0+cu118
-torchaudio==2.1.0+cu118
-torchtext==0.16.0
-torchdata==0.7.0
+torch==2.3.0+cu118
+torchvision==0.18.0+cu118
+torchaudio==2.3.0+cu118
+torchtext==0.18.0
+torchdata==0.7.1
 
 # Performance optimizations
-xformers==0.0.22.post7
-triton==2.1.0
+xformers==0.0.26.post1
+triton==2.3.0
 
 # Additional dependencies for Forge
 accelerate>=0.21.0
