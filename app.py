@@ -134,10 +134,20 @@ def download_models():
         os.makedirs(dir_path, exist_ok=True)
 
     models_to_download = [
+        # Main Checkpoint
         {"repo": "ninjawick/realistic-vision-5.1", "file": "realisticVisionV51_v51VAE.safetensors", "path": "models/Stable-diffusion"},
+        
+        # Core ControlNet Models
         {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11f1p_sd15_depth.pth", "path": "extensions/sd-webui-controlnet/models"},
         {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11p_sd15_openpose.pth", "path": "extensions/sd-webui-controlnet/models"},
-        {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11f1e_sd15_tile.pth", "path": "extensions/sd-webui-controlnet/models"}
+        {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11f1e_sd15_tile.pth", "path": "extensions/sd-webui-controlnet/models"},
+        
+        # Additional ControlNet Models
+        {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11p_sd15_canny.pth", "path": "extensions/sd-webui-controlnet/models"},
+        {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11p_sd15_scribble.pth", "path": "extensions/sd-webui-controlnet/models"},
+        {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11p_sd15_softedge.pth", "path": "extensions/sd-webui-controlnet/models"},
+        {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11p_sd15_lineart.pth", "path": "extensions/sd-webui-controlnet/models"},
+        {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11p_sd15_mlsd.pth", "path": "extensions/sd-webui-controlnet/models"}
     ]
 
     for model in models_to_download:
