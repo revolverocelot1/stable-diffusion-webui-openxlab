@@ -1,17 +1,18 @@
 [tool.ruff]
-
 target-version = "py39"
 
+exclude = [
+	"extensions",
+	"extensions-disabled",
+	"header.py",
+]
+
+[tool.ruff.lint]
 extend-select = [
   "B",
   "C",
   "I",
   "W",
-]
-
-exclude = [
-	"extensions",
-	"extensions-disabled",
 ]
 
 ignore = [
@@ -24,10 +25,10 @@ ignore = [
 	"W605", # invalid escape sequence, messes with some docstrings
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "webui.py" = ["E402"]  # Module level import not at top of file
 
-[tool.ruff.flake8-bugbear]
+[tool.ruff.lint.flake8-bugbear]
 # Allow default arguments like, e.g., `data: List[str] = fastapi.Query(None)`.
 extend-immutable-calls = ["fastapi.Depends", "fastapi.security.HTTPBasic"]
 

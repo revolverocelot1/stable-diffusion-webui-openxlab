@@ -22,17 +22,17 @@ def inject_header():
     """Inject header content into modules/ui.py at the demo: marker"""
     ui_file = 'modules/ui.py'
     header_file = 'header.py'
-    
+
     if not os.path.exists(ui_file) or not os.path.exists(header_file):
         print(f"Warning: {ui_file} or {header_file} not found, skipping header injection")
         return
-    
+
     with open(header_file, 'r') as f:
         header_content = f.read()
-    
+
     with open(ui_file, 'r') as f:
         ui_content = f.read()
-    
+
     # Find the demo: marker and inject header content after it
     demo_marker = 'demo:'
     if demo_marker in ui_content:
@@ -43,7 +43,7 @@ def inject_header():
             if demo_marker in line:
                 # Add the header content after the demo: line
                 new_lines.extend(header_content.split('\n'))
-        
+
         with open(ui_file, 'w') as f:
             f.write('\n'.join(new_lines))
         print("Header injection completed.")
@@ -55,7 +55,7 @@ def remove_lines(filename, line_numbers):
     if not os.path.exists(filename):
         print(f"Warning: {filename} not found, skipping line removal")
         return
-        
+
     with open(filename, 'r') as f:
         lines = f.readlines()
     with open(filename, 'w') as f:
@@ -72,7 +72,7 @@ inject_header()
 ui_settings_deletions = list(range(253, 259)) + list(range(186, 229)) + list(range(171, 179)) + list(range(108, 114))
 remove_lines('modules/ui_settings.py', ui_settings_deletions)
 
-# Modify modules/ui_loadsave.py - remove the specified line ranges  
+# Modify modules/ui_loadsave.py - remove the specified line ranges
 ui_loadsave_deletions = list(range(225, 228)) + list(range(214, 218))
 remove_lines('modules/ui_loadsave.py', ui_loadsave_deletions)
 
@@ -107,4 +107,4 @@ os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://hugging
 print("Models downloaded.")
 
 print("Launching Web UI...")
-os.system("python launch.py --cors-allow-origins=* --xformers --enable-insecure-extension-access --theme dark --gradio-queue --disable-safe-unpickle --ui-settings-file config.json --ui-config-file ui-config.json") 
+os.system("python launch.py --cors-allow-origins=* --xformers --enable-insecure-extension-access --theme dark --gradio-queue --disable-safe-unpickle --ui-settings-file config.json --ui-config-file ui-config.json")
