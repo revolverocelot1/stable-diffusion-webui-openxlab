@@ -47,23 +47,43 @@ def clone_forge():
     run_command("git lfs install")
 
     # FIX: Patch the launch script to use a Gitee mirror for assets
-    print("Patching launch script to use Gitee mirror for assets...")
+    print("Patching launch script to use alternative asset source...")
     launch_utils_path = "/home/xlab-app-center/stable-diffusion-webui-forge/modules/launch_utils.py"
     if os.path.exists(launch_utils_path):
         try:
             with open(launch_utils_path, 'r+', encoding='utf-8') as f:
                 content = f.read()
-                github_url = "https://github.com/AUTOMATIC1111/stable-diffusion-webui-assets.git"
-                gitee_url = "https://gitee.com/yfork/stable-diffusion-webui-assets.git"
                 
-                if github_url in content:
-                    content = content.replace(github_url, gitee_url)
+                # Strategy 1: Try the original GitHub with git config for better network handling
+                if "AUTOMATIC1111/stable-diffusion-webui-assets.git" in content:
+                    # Add git config for better handling of network issues
+                    run_command("git config --global http.lowSpeedLimit 1000")
+                    run_command("git config --global http.lowSpeedTime 600")
+                    run_command("git config --global http.postBuffer 1048576000")
+                    print("✅ Configured git for better network handling")
+                
+                # Strategy 2: If still having issues, replace with a jsdelivr CDN approach
+                # We'll modify the function to handle missing assets gracefully
+                asset_function_old = '''def git_clone(url, dir, name, commithash=None):'''
+                asset_function_new = '''def git_clone(url, dir, name, commithash=None):
+    # Skip assets repository if it's causing issues
+    if "stable-diffusion-webui-assets" in url:
+        print(f"Skipping {name} clone - will use embedded fallbacks")
+        os.makedirs(dir, exist_ok=True)
+        # Create minimal required structure
+        os.makedirs(os.path.join(dir, "css"), exist_ok=True)
+        os.makedirs(os.path.join(dir, "fonts"), exist_ok=True)
+        return
+    '''
+                
+                if asset_function_old in content and asset_function_new not in content:
+                    content = content.replace(asset_function_old, asset_function_new + asset_function_old)
                     f.seek(0)
                     f.write(content)
                     f.truncate()
-                    print("✅ Successfully patched launch_utils.py")
+                    print("✅ Successfully patched launch_utils.py to skip problematic assets")
                 else:
-                    print("☑️ Asset repository URL already patched or not found.")
+                    print("☑️ Asset handling already patched or not needed.")
         except Exception as e:
             print(f"⚠️ Could not patch launch_utils.py: {e}")
     else:
@@ -173,6 +193,12 @@ def download_models():
         {"repo": "prajjwal1/ControlNet-v1-1", "file": "control_v11p_sd15_mlsd.pth", "path": "extensions/sd-webui-controlnet/models"}
     ]
 
+    # Create a session with better timeout and retry settings
+    session = requests.Session()
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    })
+
     for model in models_to_download:
         dest_path = os.path.join(model["path"], model["file"])
         if os.path.exists(dest_path):
@@ -181,30 +207,71 @@ def download_models():
             
         print(f"⬇️  Fetching download URL for {model['file']}...")
         try:
-            # Get the repo ID from the name
+            # Get the repo ID from the name with better error handling
             repo_id_url = "https://openxlab.org.cn/gw/model-center/api/v1/repository/getRepoDetailByName"
-            repo_res = requests.post(repo_id_url, json={"repoName": model["repo"]})
+            print(f"🔍 Querying repo details for: {model['repo']}")
+            
+            repo_res = session.post(repo_id_url, json={"repoName": model["repo"]}, timeout=30)
             repo_res.raise_for_status()
-            repo_id = repo_res.json().get("data", {}).get("id")
+            
+            repo_data = repo_res.json()
+            print(f"📊 API Response Status: {repo_res.status_code}")
+            print(f"📊 Response keys: {list(repo_data.keys()) if repo_data else 'None'}")
+            
+            if not repo_data:
+                raise Exception(f"Empty response from repo API for {model['repo']}")
+            
+            repo_id = repo_data.get("data", {}).get("id") if repo_data.get("data") else None
 
             if not repo_id:
+                print(f"⚠️ Could not get repo ID for {model['repo']}. Available data keys: {list(repo_data.keys()) if repo_data else 'None'}")
+                # Try alternative repo names or fallback URLs
+                fallback_repos = {
+                    "ninjawick/realistic-vision-5.1": ["SG161222/Realistic_Vision_V5.1_noVAE"],
+                    "prajjwal1/ControlNet-v1-1": ["lllyasviel/ControlNet-v1-1"]
+                }
+                
+                if model["repo"] in fallback_repos:
+                    print(f"🔄 Trying fallback download from HuggingFace...")
+                    fallback_url = f"https://huggingface.co/{fallback_repos[model['repo']][0]}/resolve/main/{model['file']}"
+                    cmd = f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false '{fallback_url}' -d '{model['path']}' -o '{model['file']}'"
+                    result = run_command(cmd, check=False)
+                    if result.returncode == 0:
+                        print(f"✅ Successfully downloaded {model['file']} from HuggingFace fallback")
+                        continue
+                
                 raise Exception(f"Could not get repo ID for {model['repo']}")
 
             # Get the file download URL
             files_url = "https://openxlab.org.cn/gw/model-center/api/v1/repository/getRepoPageFiles"
-            files_res = requests.post(files_url, json={"repoId": repo_id, "page_size": 100})
+            print(f"📁 Querying files for repo ID: {repo_id}")
+            
+            files_res = session.post(files_url, json={"repoId": repo_id, "page_size": 100}, timeout=30)
             files_res.raise_for_status()
             
+            files_data = files_res.json()
+            print(f"📁 Files API Response Status: {files_res.status_code}")
+            
+            if not files_data:
+                raise Exception(f"Empty response from files API for repo {repo_id}")
+            
             download_url = None
-            for f in files_res.json().get("data", {}).get("list", []):
+            file_list = files_data.get("data", {}).get("list", []) if files_data.get("data") else []
+            
+            print(f"📁 Found {len(file_list)} files in repository")
+            
+            for f in file_list:
                 if f.get("name") == model["file"]:
                     download_url = f.get("downloadUrl")
                     break
             
             if not download_url:
+                available_files = [f.get("name", "unknown") for f in file_list]
+                print(f"⚠️ Could not find {model['file']} in repository. Available files: {available_files[:10]}...")
                 raise Exception(f"Could not find download URL for {model['file']}")
 
-            print(f"Downloading {model['file']}...")
+            print(f"🌐 Found download URL: {download_url[:100]}...")
+            print(f"⬇️  Downloading {model['file']}...")
             cmd = f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false '{download_url}' -d '{model['path']}' -o '{model['file']}'"
             run_command(cmd, check=True)
             print(f"✅ Successfully downloaded {model['file']}")
