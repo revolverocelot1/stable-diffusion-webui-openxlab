@@ -12,6 +12,10 @@ try:
 except Exception as e:
     print(f'Warning: could not patch launch_utils for shallow clone: {e}')
 
+# Use a proxy for github to avoid connection timeouts
+os.environ['CLIP_PACKAGE'] = "https://ghproxy.com/https://github.com/openai/CLIP/archive/d50d76daa670286dd6cacf3bcd80b5e4823fc8e1.zip"
+os.environ['OPENCLIP_PACKAGE'] = "https://ghproxy.com/https://github.com/mlfoundations/open_clip/archive/bb6e834e9c70d9c27d0dc3ecedeebeaeb1ffad6b.zip"
+
 # Create requirements.txt with the exact dependencies from the reference
 with open('requirements.txt', 'w') as f:
     f.write("""--extra-index-url https://download.pytorch.org/whl/cu118
