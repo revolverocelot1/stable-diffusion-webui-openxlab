@@ -1,6 +1,17 @@
 import os
 import time
 
+# environment variables to make git clone more robust
+os.environ.setdefault('GIT_LFS_SKIP_SMUDGE', '1')  # skip downloading large files
+os.environ.setdefault('GIT_OPTIONAL_LOCKS', '0')
+
+# Patch launch_utils.py to perform shallow clone with retries
+patch_cmd = ("sed -i -e 's/\"git\" clone /\"git\" -c http.postBuffer=524288000 -c http.lowSpeedLimit=0 -c http.lowSpeedTime=999999 clone --depth 1 --filter=blob:none /' modules/launch_utils.py")
+try:
+    os.system(patch_cmd)
+except Exception as e:
+    print(f'Warning: could not patch launch_utils for shallow clone: {e}')
+
 # Create requirements.txt with the exact dependencies from the reference
 with open('requirements.txt', 'w') as f:
     f.write("""--extra-index-url https://download.pytorch.org/whl/cu118
