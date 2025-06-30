@@ -4,6 +4,10 @@ target-version = "py39"
 exclude = [
 	"extensions",
 	"extensions-disabled",
+	"extensions-builtin",
+	"modules",
+	"scripts",
+	"test",
 	"header.py",
 ]
 
@@ -17,7 +21,9 @@ extend-select = [
 
 ignore = [
 	"E501", # Line too long
+	"E721", # Use `is` and `is not` for type comparisons (many in base codebase)
 	"E731", # Do not assign a `lambda` expression, use a `def`
+	"F811", # Redefinition of unused variable (many in base codebase)
 	
 	"I001", # Import block is un-sorted or un-formatted
 	"C901", # Function is too complex
