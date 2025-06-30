@@ -90,10 +90,10 @@ print("Extensions cloned.")
 
 print("Downloading ControlNet models (only the .safetensors files, not YAML)...")
 # Download only the essential ControlNet models (.safetensors files) - no YAML files as requested
-os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11f1p_sd15_depth_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11f1p_sd15_depth_fp16.safetensors")
-os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11p_sd15_openpose_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11p_sd15_openpose_fp16.safetensors")
-os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11p_sd15s2_lineart_anime_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11p_sd15s2_lineart_anime_fp16.safetensors")
-os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11f1e_sd15_tile_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11f1e_sd15_tile_fp16.safetensors")
+#os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11f1p_sd15_depth_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11f1p_sd15_depth_fp16.safetensors")
+#os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11p_sd15_openpose_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11p_sd15_openpose_fp16.safetensors")
+#os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11p_sd15s2_lineart_anime_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11p_sd15s2_lineart_anime_fp16.safetensors")
+#os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11f1e_sd15_tile_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11f1e_sd15_tile_fp16.safetensors")
 print("ControlNet models downloaded.")
 
 print("Downloading models from OpenXLab...")
