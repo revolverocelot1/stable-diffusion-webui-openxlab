@@ -78,6 +78,11 @@ class DisableInitialization(ReplaceHelper):
             # this file is always 404, prevent making request
             if url == 'https://huggingface.co/openai/clip-vit-large-patch14/resolve/main/added_tokens.json' or url == 'openai/clip-vit-large-patch14' and args[0] == 'added_tokens.json':
                 return None
+            
+            # Skip any Hugging Face URLs in restricted environment
+            if isinstance(url, str) and ('huggingface.co' in url or 'hf.co' in url):
+                print(f"Skipping blocked URL: {url}")
+                return None
 
             try:
                 res = original(url, *args, local_files_only=True, **kwargs)
@@ -85,7 +90,12 @@ class DisableInitialization(ReplaceHelper):
                     res = original(url, *args, local_files_only=False, **kwargs)
                 return res
             except Exception:
-                return original(url, *args, local_files_only=False, **kwargs)
+                # In restricted environments, always use local files only
+                try:
+                    return original(url, *args, local_files_only=True, **kwargs)
+                except:
+                    print(f"Warning: Could not load {url}, using fallback")
+                    return None
 
         def transformers_utils_hub_get_from_cache(url, *args, local_files_only=False, **kwargs):
             return transformers_utils_hub_get_file_from_cache(self.transformers_utils_hub_get_from_cache, url, *args, **kwargs)

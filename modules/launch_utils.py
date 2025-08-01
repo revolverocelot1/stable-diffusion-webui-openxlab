@@ -20,7 +20,7 @@ logging_config.setup_logging(args.loglevel)
 
 python = sys.executable
 git = os.environ.get('GIT', "git")
-index_url = os.environ.get('INDEX_URL', "")
+index_url = os.environ.get('INDEX_URL', "https://mirrors.aliyun.com/pypi/simple/")
 dir_repos = "repositories"
 
 # Whether to default to printing command output
@@ -163,8 +163,26 @@ def run_git(dir, name, command, desc=None, errdesc=None, custom_env=None, live: 
 
 
 def git_clone(url, dir, name, commithash=None):
-    # TODO clone into temporary dir and move if successful
-
+    # Handle local repositories
+    if url.startswith("local://"):
+        local_path = url[8:]  # Remove "local://" prefix
+        local_repo_path = os.path.join(script_path, local_path)
+        
+        if os.path.exists(local_repo_path):
+            print(f"Using local repository copy for {name} from {local_repo_path}")
+            if not os.path.exists(dir):
+                shutil.copytree(local_repo_path, dir)
+            return
+        else:
+            print(f"Warning: Local repository not found at {local_repo_path}, skipping {name}")
+            return
+    
+    # Handle URLs that might be blocked
+    if "github.com" in url or "huggingface.co" in url:
+        print(f"Warning: Skipping {name} - external repository access is blocked")
+        return
+    
+    # Original git clone logic
     if os.path.exists(dir):
         if commithash is None:
             return
@@ -308,19 +326,22 @@ def requirements_met(requirements_file):
 
 
 def prepare_environment():
-    torch_index_url = os.environ.get('TORCH_INDEX_URL', "https://download.pytorch.org/whl/cu118")
+    torch_index_url = os.environ.get('TORCH_INDEX_URL', "https://mirrors.aliyun.com/pytorch-wheels/cu118")
     torch_command = os.environ.get('TORCH_COMMAND', f"pip install torch==2.0.1 torchvision==0.15.2 --extra-index-url {torch_index_url}")
     requirements_file = os.environ.get('REQS_FILE', "requirements_versions.txt")
 
     xformers_package = os.environ.get('XFORMERS_PACKAGE', 'xformers==0.0.20')
-    clip_package = os.environ.get('CLIP_PACKAGE', "https://github.com/openai/CLIP/archive/d50d76daa670286dd6cacf3bcd80b5e4823fc8e1.zip")
-    openclip_package = os.environ.get('OPENCLIP_PACKAGE', "https://github.com/mlfoundations/open_clip/archive/bb6e834e9c70d9c27d0dc3ecedeebeaeb1ffad6b.zip")
+    
+    # Use local pre-downloaded packages or OpenXLab alternatives
+    clip_package = os.environ.get('CLIP_PACKAGE', "clip==1.0")  # Will use pip install from mirror
+    openclip_package = os.environ.get('OPENCLIP_PACKAGE', "open_clip_torch")  # Will use pip install from mirror
 
-    stable_diffusion_repo = os.environ.get('STABLE_DIFFUSION_REPO', "https://github.com/Stability-AI/stablediffusion.git")
-    stable_diffusion_xl_repo = os.environ.get('STABLE_DIFFUSION_XL_REPO', "https://github.com/Stability-AI/generative-models.git")
-    k_diffusion_repo = os.environ.get('K_DIFFUSION_REPO', 'https://github.com/crowsonkb/k-diffusion.git')
-    codeformer_repo = os.environ.get('CODEFORMER_REPO', 'https://github.com/sczhou/CodeFormer.git')
-    blip_repo = os.environ.get('BLIP_REPO', 'https://github.com/salesforce/BLIP.git')
+    # Local repository paths - we'll handle these differently
+    stable_diffusion_repo = os.environ.get('STABLE_DIFFUSION_REPO', "local://repositories/stablediffusion")
+    stable_diffusion_xl_repo = os.environ.get('STABLE_DIFFUSION_XL_REPO', "local://repositories/generative-models")
+    k_diffusion_repo = os.environ.get('K_DIFFUSION_REPO', 'local://repositories/k-diffusion')
+    codeformer_repo = os.environ.get('CODEFORMER_REPO', 'local://repositories/CodeFormer')
+    blip_repo = os.environ.get('BLIP_REPO', 'local://repositories/BLIP')
 
     stable_diffusion_commit_hash = os.environ.get('STABLE_DIFFUSION_COMMIT_HASH', "cf1d67a6fd5ea1aa600c4df58e5b47da45f6bdbf")
     stable_diffusion_xl_commit_hash = os.environ.get('STABLE_DIFFUSION_XL_COMMIT_HASH', "45c443b316737a4ab6e40413d7794a7f5657c19f")
@@ -360,11 +381,19 @@ def prepare_environment():
     startup_timer.record("torch GPU test")
 
     if not is_installed("clip"):
-        run_pip(f"install {clip_package}", "clip")
+        # Try to install from Chinese mirror
+        try:
+            run_pip(f"install -i https://mirrors.aliyun.com/pypi/simple/ clip", "clip")
+        except:
+            print("Warning: Could not install clip from mirror, will try to use local version")
         startup_timer.record("install clip")
 
-    if not is_installed("open_clip"):
-        run_pip(f"install {openclip_package}", "open_clip")
+    if not is_installed("open_clip_torch"):
+        # Try to install from Chinese mirror
+        try:
+            run_pip(f"install -i https://mirrors.aliyun.com/pypi/simple/ open-clip-torch", "open_clip")
+        except:
+            print("Warning: Could not install open_clip from mirror, will try to use local version")
         startup_timer.record("install open_clip")
 
     if (not is_installed("xformers") or args.reinstall_xformers) and args.xformers:

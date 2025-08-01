@@ -1,5 +1,6 @@
 import os
 import time
+import shutil
 
 # Enable local dependencies mode for OpenXLab deployment
 os.environ['USE_LOCAL_DEPS'] = 'true'
@@ -99,33 +100,94 @@ remove_lines('modules/ui_loadsave.py', ui_loadsave_deletions)
 
 print("UI modifications applied.")
 
-print("Cloning extensions...")
-os.system("git clone https://github.com/mcmonkeyprojects/sd-dynamic-thresholding extensions/sd-dynamic-thresholding")
-os.system("git clone https://github.com/Mikubill/sd-webui-controlnet extensions/sd-webui-controlnet")
-os.system("git clone https://github.com/camenduru/sd-civitai-browser extensions/sd-civitai-browser")
-os.system("git clone https://github.com/LonicaMewinsky/gif2gif extensions/gif2gif")
-os.system("git clone https://github.com/zanllp/sd-webui-infinite-image-browsing extensions/sd-webui-infinite-image-browsing")
-os.system("git clone https://github.com/P2Enjoy/sd-webui-roop-uncensored extensions/sd-webui-roop-uncensored")
-os.system("git clone https://github.com/Gourieff/sd-webui-reactor extensions/sd-webui-reactor")
-print("Extensions cloned.")
+print("Setting up extensions...")
 
-print("Downloading ControlNet models (only the .safetensors files, not YAML)...")
-# Download only the essential ControlNet models (.safetensors files) - no YAML files as requested
-#os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11f1p_sd15_depth_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11f1p_sd15_depth_fp16.safetensors")
-#os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11p_sd15_openpose_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11p_sd15_openpose_fp16.safetensors")
-#os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11p_sd15s2_lineart_anime_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11p_sd15s2_lineart_anime_fp16.safetensors")
-#os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M --async-dns=false https://huggingface.co/ckpt/ControlNet-v1-1/resolve/main/control_v11f1e_sd15_tile_fp16.safetensors -d extensions/sd-webui-controlnet/models -o control_v11f1e_sd15_tile_fp16.safetensors")
-print("ControlNet models downloaded.")
+# Create extensions directory if it doesn't exist
+if not os.path.exists("extensions"):
+    os.makedirs("extensions")
 
-print("Downloading models from OpenXLab...")
-# Use the correct OpenXLab model URLs as per user's specification
-nonce = int(time.time() * 1000)  # Generate a nonce timestamp
-os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/repos/ninjawick/realistic-vision-5.1/media/Realistic_Vision_V6.0_NV_B1_inpainting.safetensors?ref=main&nonce={nonce} -d models/Stable-diffusion -o Realistic_Vision_V6.0_NV_B1_inpainting.safetensors")
-os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/repos/ninjawick/realistic-vision-5.1/media/realisticVisionV51_v51VAE?ref=main&nonce={nonce+1} -d models/Stable-diffusion -o realisticVisionV51_v51VAE.safetensors")
+# List of required extensions (can be pre-downloaded and placed in a local folder)
+extensions_list = [
+    ("sd-dynamic-thresholding", "Dynamic Thresholding extension"),
+    ("sd-webui-controlnet", "ControlNet extension"),
+    ("sd-civitai-browser", "Civitai Browser extension"),
+    ("gif2gif", "GIF2GIF extension"),
+    ("sd-webui-infinite-image-browsing", "Infinite Image Browsing extension"),
+    ("sd-webui-roop-uncensored", "Roop Uncensored extension"),
+    ("sd-webui-reactor", "Reactor extension")
+]
 
-# Add the backup Hugging Face model as in the original
-os.system("aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/SG161222/Realistic_Vision_V5.1_noVAE/resolve/main/Realistic_Vision_V5.1_fp16-no-ema.safetensors -d models/Stable-diffusion -o Realistic_Vision_V5.1_fp16-no-ema.safetensors")
-print("Models downloaded.")
+# Try to use local pre-downloaded extensions
+local_ext_path = "local_extensions"
+if os.path.exists(local_ext_path):
+    print(f"Found local extensions directory at {local_ext_path}")
+    for ext_name, ext_desc in extensions_list:
+        src_path = os.path.join(local_ext_path, ext_name)
+        dst_path = os.path.join("extensions", ext_name)
+        if os.path.exists(src_path) and not os.path.exists(dst_path):
+            print(f"Copying {ext_desc} from local directory...")
+            shutil.copytree(src_path, dst_path)
+        elif os.path.exists(dst_path):
+            print(f"{ext_desc} already exists, skipping...")
+        else:
+            print(f"Warning: {ext_desc} not found in local directory")
+else:
+    print("Warning: No local extensions directory found. Extensions need to be manually installed.")
+    print("Please download the following extensions and place them in the 'extensions' folder:")
+    for ext_name, ext_desc in extensions_list:
+        print(f"  - {ext_name}: {ext_desc}")
+
+print("Extensions setup completed.")
+
+print("Setting up models...")
+
+# Create necessary directories
+os.makedirs("models/Stable-diffusion", exist_ok=True)
+os.makedirs("extensions/sd-webui-controlnet/models", exist_ok=True)
+
+# Check for local models first
+local_models_path = "local_models"
+if os.path.exists(local_models_path):
+    print(f"Found local models directory at {local_models_path}")
+    # Copy Stable Diffusion models
+    sd_models = ["Realistic_Vision_V6.0_NV_B1_inpainting.safetensors", 
+                 "realisticVisionV51_v51VAE.safetensors",
+                 "Realistic_Vision_V5.1_fp16-no-ema.safetensors"]
+    
+    for model in sd_models:
+        src = os.path.join(local_models_path, "stable-diffusion", model)
+        dst = os.path.join("models/Stable-diffusion", model)
+        if os.path.exists(src) and not os.path.exists(dst):
+            print(f"Copying {model}...")
+            shutil.copy2(src, dst)
+    
+    # Copy ControlNet models
+    controlnet_models = ["control_v11f1p_sd15_depth_fp16.safetensors",
+                        "control_v11p_sd15_openpose_fp16.safetensors",
+                        "control_v11p_sd15s2_lineart_anime_fp16.safetensors",
+                        "control_v11f1e_sd15_tile_fp16.safetensors"]
+    
+    for model in controlnet_models:
+        src = os.path.join(local_models_path, "controlnet", model)
+        dst = os.path.join("extensions/sd-webui-controlnet/models", model)
+        if os.path.exists(src) and not os.path.exists(dst):
+            print(f"Copying ControlNet model {model}...")
+            shutil.copy2(src, dst)
+else:
+    print("Downloading models from OpenXLab...")
+    # Use the correct OpenXLab model URLs
+    nonce = int(time.time() * 1000)  # Generate a nonce timestamp
+    
+    # Try OpenXLab first
+    print("Attempting to download from OpenXLab...")
+    os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/repos/ninjawick/realistic-vision-5.1/media/Realistic_Vision_V6.0_NV_B1_inpainting.safetensors?ref=main&nonce={nonce} -d models/Stable-diffusion -o Realistic_Vision_V6.0_NV_B1_inpainting.safetensors")
+    os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/repos/ninjawick/realistic-vision-5.1/media/realisticVisionV51_v51VAE?ref=main&nonce={nonce+1} -d models/Stable-diffusion -o realisticVisionV51_v51VAE.safetensors")
+    
+    # Try alternative OpenXLab model
+    print("Downloading OpenXL v3.0 model from OpenXLab...")
+    os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/repos/xiaozhijason/openxl/media/openxlv3.safetensors?ref=main&nonce={nonce+2} -d models/Stable-diffusion -o openxlv3.safetensors")
+
+print("Models setup completed.")
 
 print("Launching Web UI...")
 os.system("python launch.py --cors-allow-origins=* --xformers --enable-insecure-extension-access --theme dark --gradio-queue --disable-safe-unpickle --ui-settings-file config.json --ui-config-file ui-config.json")
