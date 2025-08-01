@@ -1,4 +1,13 @@
-from modules import launch_utils
+import os
+
+# Check if we should use local dependencies (for OpenXLab deployment)
+USE_LOCAL_DEPS = os.environ.get('USE_LOCAL_DEPS', 'true').lower() == 'true'
+
+if USE_LOCAL_DEPS and os.path.exists('modules/launch_utils_local.py'):
+    print("Using local dependencies mode")
+    from modules import launch_utils_local as launch_utils
+else:
+    from modules import launch_utils
 
 args = launch_utils.args
 python = launch_utils.python

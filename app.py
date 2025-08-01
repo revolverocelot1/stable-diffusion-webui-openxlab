@@ -1,20 +1,26 @@
 import os
 import time
 
+# Enable local dependencies mode for OpenXLab deployment
+os.environ['USE_LOCAL_DEPS'] = 'true'
+
 # environment variables to make git clone more robust
 os.environ.setdefault('GIT_LFS_SKIP_SMUDGE', '1')  # skip downloading large files
 os.environ.setdefault('GIT_OPTIONAL_LOCKS', '0')
 
-# Patch launch_utils.py to perform shallow clone with retries
-patch_cmd = ("sed -i -e 's/\"git\" clone /\"git\" -c http.postBuffer=524288000 -c http.lowSpeedLimit=0 -c http.lowSpeedTime=999999 clone --depth 1 --filter=blob:none /' modules/launch_utils.py")
-try:
-    os.system(patch_cmd)
-except Exception as e:
-    print(f'Warning: could not patch launch_utils for shallow clone: {e}')
+# Check if dependencies exist locally
+deps_dir = os.path.join(os.path.dirname(__file__), 'dependencies')
+if not os.path.exists(deps_dir):
+    print("WARNING: Local dependencies not found. Some features may not work in OpenXLab environment.")
+    print("Please run download_dependencies.py to download all dependencies locally.")
+else:
+    print("Found local dependencies directory.")
 
-# Use a proxy for github to avoid connection timeouts
-os.environ['CLIP_PACKAGE'] = "https://ghproxy.com/https://github.com/openai/CLIP/archive/d50d76daa670286dd6cacf3bcd80b5e4823fc8e1.zip"
-os.environ['OPENCLIP_PACKAGE'] = "https://ghproxy.com/https://github.com/mlfoundations/open_clip/archive/bb6e834e9c70d9c27d0dc3ecedeebeaeb1ffad6b.zip"
+# If local dependencies don't exist, try using proxy for github
+if not os.path.exists(deps_dir):
+    # Use a proxy for github to avoid connection timeouts
+    os.environ['CLIP_PACKAGE'] = "https://ghproxy.com/https://github.com/openai/CLIP/archive/d50d76daa670286dd6cacf3bcd80b5e4823fc8e1.zip"
+    os.environ['OPENCLIP_PACKAGE'] = "https://ghproxy.com/https://github.com/mlfoundations/open_clip/archive/bb6e834e9c70d9c27d0dc3ecedeebeaeb1ffad6b.zip"
 
 # Create requirements.txt with the exact dependencies from the reference
 with open('requirements.txt', 'w') as f:
@@ -123,3 +129,4 @@ print("Models downloaded.")
 
 print("Launching Web UI...")
 os.system("python launch.py --cors-allow-origins=* --xformers --enable-insecure-extension-access --theme dark --gradio-queue --disable-safe-unpickle --ui-settings-file config.json --ui-config-file ui-config.json")
+ 
