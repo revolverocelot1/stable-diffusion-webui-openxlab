@@ -64,7 +64,7 @@ def main():
             },
             "k-diffusion": {
                 "url": "https://github.com/crowsonkb/k-diffusion.git",
-                "commit": "1e3cd256c40ad78d94f1fa760913cd01d2f01ee5"
+                "commit": "ab527a9a6d347f364e3d185ba6d714e22d80cb3c"
             },
             "CodeFormer": {
                 "url": "https://github.com/sczhou/CodeFormer.git",

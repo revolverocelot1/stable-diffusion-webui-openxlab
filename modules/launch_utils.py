@@ -406,11 +406,26 @@ def prepare_environment():
 
     os.makedirs(os.path.join(script_path, dir_repos), exist_ok=True)
 
-    git_clone(stable_diffusion_repo, repo_dir('stable-diffusion-stability-ai'), "Stable Diffusion", stable_diffusion_commit_hash)
-    git_clone(stable_diffusion_xl_repo, repo_dir('generative-models'), "Stable Diffusion XL", stable_diffusion_xl_commit_hash)
-    git_clone(k_diffusion_repo, repo_dir('k-diffusion'), "K-diffusion", k_diffusion_commit_hash)
-    git_clone(codeformer_repo, repo_dir('CodeFormer'), "CodeFormer", codeformer_commit_hash)
-    git_clone(blip_repo, repo_dir('BLIP'), "BLIP", blip_commit_hash)
+    # Check if repositories exist in dependencies folder first
+    repos_to_clone = [
+        (stable_diffusion_repo, 'stable-diffusion-stability-ai', "Stable Diffusion", stable_diffusion_commit_hash),
+        (stable_diffusion_xl_repo, 'generative-models', "Stable Diffusion XL", stable_diffusion_xl_commit_hash),
+        (k_diffusion_repo, 'k-diffusion', "K-diffusion", k_diffusion_commit_hash),
+        (codeformer_repo, 'CodeFormer', "CodeFormer", codeformer_commit_hash),
+        (blip_repo, 'BLIP', "BLIP", blip_commit_hash)
+    ]
+    
+    for repo_url, repo_name, desc, commit_hash in repos_to_clone:
+        target_dir = repo_dir(repo_name)
+        
+        # Check if repo exists in dependencies folder
+        deps_repo_path = os.path.join(script_path, 'dependencies', 'repos', repo_name)
+        if os.path.exists(deps_repo_path) and not os.path.exists(target_dir):
+            print(f"Copying {desc} from local dependencies...")
+            import shutil
+            shutil.copytree(deps_repo_path, target_dir)
+        else:
+            git_clone(repo_url, target_dir, desc, commit_hash)
 
     startup_timer.record("clone repositores")
 

@@ -1,0 +1,52 @@
+{
+  "model_sources": {
+    "huggingface_mirror": "https://hf-mirror.com",
+    "modelscope": "https://modelscope.cn/api/v1/models",
+    "openxlab": "https://openxlab.org.cn/models",
+    "civitai": "https://civitai.com/api/download/models"
+  },
+  "recommended_models": {
+    "stable-diffusion": [
+      {
+        "name": "Stable Diffusion XL Base 1.0",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "urls": [
+          "https://hf-mirror.com/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors",
+          "https://modelscope.cn/api/v1/models/AI-ModelScope/stable-diffusion-xl-base-1.0/repo?FilePath=sd_xl_base_1.0.safetensors"
+        ]
+      },
+      {
+        "name": "Realistic Vision V5.1",
+        "filename": "realisticVisionV51.safetensors",
+        "urls": [
+          "https://civitai.com/api/download/models/130072"
+        ]
+      }
+    ],
+    "vae": [
+      {
+        "name": "SDXL VAE",
+        "filename": "sdxl_vae.safetensors",
+        "urls": [
+          "https://hf-mirror.com/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/vae/diffusion_pytorch_model.safetensors"
+        ]
+      },
+      {
+        "name": "SD 1.5 VAE",
+        "filename": "vae-ft-mse-840000-ema-pruned.safetensors",
+        "urls": [
+          "https://hf-mirror.com/stabilityai/sd-vae-ft-mse-original/resolve/main/vae-ft-mse-840000-ema-pruned.safetensors"
+        ]
+      }
+    ],
+    "upscalers": [
+      {
+        "name": "RealESRGAN_x4plus",
+        "filename": "RealESRGAN_x4plus.pth",
+        "urls": [
+          "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth"
+        ]
+      }
+    ]
+  }
+}

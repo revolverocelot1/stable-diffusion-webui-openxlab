@@ -10,6 +10,37 @@ from modules.upscaler import Upscaler, UpscalerLanczos, UpscalerNearest, Upscale
 from modules.paths import script_path, models_path
 
 
+
+# China mirror support
+def try_download_with_mirrors(url: str, dest_path: str, progress: bool = True) -> bool:
+    """Try to download from multiple mirrors"""
+    mirrors = {
+        "huggingface.co": ["hf-mirror.com", "modelscope.cn"],
+        "github.com": ["gitee.com", "ghproxy.com/https://github.com"],
+    }
+    
+    urls_to_try = [url]
+    
+    # Add mirror URLs
+    for original, replacements in mirrors.items():
+        if original in url:
+            for mirror in replacements:
+                mirror_url = url.replace(original, mirror)
+                urls_to_try.append(mirror_url)
+    
+    # Try each URL
+    for try_url in urls_to_try:
+        try:
+            print(f"Trying: {try_url}")
+            from torch.hub import download_url_to_file
+            download_url_to_file(try_url, dest_path, progress=progress)
+            return True
+        except Exception as e:
+            print(f"Failed: {e}")
+            continue
+    
+    return False
+
 def load_file_from_url(
     url: str,
     *,
@@ -29,7 +60,8 @@ def load_file_from_url(
     if not os.path.exists(cached_file):
         print(f'Downloading: "{url}" to {cached_file}\n')
         from torch.hub import download_url_to_file
-        download_url_to_file(url, cached_file, progress=progress)
+        if not try_download_with_mirrors(url, cached_file, progress=progress):
+            raise Exception(f'Failed to download from all mirrors: {url}')
     return cached_file
 
 
