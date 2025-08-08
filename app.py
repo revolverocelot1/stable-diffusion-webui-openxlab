@@ -183,9 +183,9 @@ else:
     os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/repos/ninjawick/realistic-vision-5.1/media/Realistic_Vision_V6.0_NV_B1_inpainting.safetensors?ref=main&nonce={nonce} -d models/Stable-diffusion -o Realistic_Vision_V6.0_NV_B1_inpainting.safetensors")
     os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/repos/ninjawick/realistic-vision-5.1/media/realisticVisionV51_v51VAE?ref=main&nonce={nonce+1} -d models/Stable-diffusion -o realisticVisionV51_v51VAE.safetensors")
     
-    # Try alternative OpenXLab model
-    print("Downloading OpenXL v3.0 model from OpenXLab...")
-    os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/repos/xiaozhijason/openxl/media/openxlv3.safetensors?ref=main&nonce={nonce+2} -d models/Stable-diffusion -o openxlv3.safetensors")
+    # Download a recommended model as a fallback
+    print("Downloading Realistic Vision v5.1 model from OpenXLab...")
+    os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/models/SG_161222/Realistic_Vision_V5.1_noVAE/realisticVisionV51.safetensors?nonce={nonce+2} -d models/Stable-diffusion -o realisticVisionV51.safetensors")
 
 print("Models setup completed.")
 
