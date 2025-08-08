@@ -1,6 +1,34 @@
 import os
 import time
 import shutil
+import subprocess
+
+def download_with_aria2(url, dest_dir, filename):
+    """Download a file using aria2c in a subprocess for robustness."""
+    print(f"Attempting to download {filename}...")
+    header = 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+
+    try:
+        # Using subprocess.run for better error handling and argument passing
+        result = subprocess.run([
+            "aria2c",
+            "--console-log-level=error",
+            "--continue=true",
+            "--max-connection-per-server=16",
+            "--split=16",
+            "--min-split-size=1M",
+            f"--header={header}",
+            url,
+            "--dir", dest_dir,
+            "--out", filename
+        ], check=True, capture_output=True, text=True, encoding='utf-8')
+        print(f"✓ Successfully downloaded: {filename}")
+    except FileNotFoundError:
+        print("✗ Error: aria2c not found. Please ensure it is installed and in your PATH.")
+    except subprocess.CalledProcessError as e:
+        print(f"✗ Failed to download {filename}.")
+        print(f"  Return code: {e.returncode}")
+        print(f"  Stderr: {e.stderr.strip()}")
 
 # Enable local dependencies mode for OpenXLab deployment
 os.environ['USE_LOCAL_DEPS'] = 'true'
@@ -175,17 +203,32 @@ if os.path.exists(local_models_path):
             shutil.copy2(src, dst)
 else:
     print("Downloading models from OpenXLab...")
-    # Use the correct OpenXLab model URLs
-    nonce = int(time.time() * 1000)  # Generate a nonce timestamp
-    
-    # Try OpenXLab first
-    print("Attempting to download from OpenXLab...")
-    os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/repos/ninjawick/realistic-vision-5.1/media/Realistic_Vision_V6.0_NV_B1_inpainting.safetensors?ref=main&nonce={nonce} -d models/Stable-diffusion -o Realistic_Vision_V6.0_NV_B1_inpainting.safetensors")
-    os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/repos/ninjawick/realistic-vision-5.1/media/realisticVisionV51_v51VAE?ref=main&nonce={nonce+1} -d models/Stable-diffusion -o realisticVisionV51_v51VAE.safetensors")
-    
-    # Download a recommended model as a fallback
-    print("Downloading Realistic Vision v5.1 model from OpenXLab...")
-    os.system(f"aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://code.openxlab.org.cn/api/v1/models/SG_161222/Realistic_Vision_V5.1_noVAE/realisticVisionV51.safetensors?nonce={nonce+2} -d models/Stable-diffusion -o realisticVisionV51.safetensors")
+    nonce = int(time.time() * 1000)
+    dest_dir = "models/Stable-diffusion"
+
+    # Model 1
+    url1 = f"https://code.openxlab.org.cn/api/v1/repos/ninjawick/realistic-vision-5.1/media/Realistic_Vision_V6.0_NV_B1_inpainting.safetensors?ref=main&nonce={nonce}"
+    file1 = "Realistic_Vision_V6.0_NV_B1_inpainting.safetensors"
+    if not os.path.exists(os.path.join(dest_dir, file1)):
+        download_with_aria2(url1, dest_dir, file1)
+    else:
+        print(f"✓ Already exists: {file1}")
+
+    # Model 2
+    url2 = f"https://code.openxlab.org.cn/api/v1/repos/ninjawick/realistic-vision-5.1/media/realisticVisionV51_v51VAE?ref=main&nonce={nonce+1}"
+    file2 = "realisticVisionV51_v51VAE.safetensors"
+    if not os.path.exists(os.path.join(dest_dir, file2)):
+        download_with_aria2(url2, dest_dir, file2)
+    else:
+        print(f"✓ Already exists: {file2}")
+
+    # Model 3 (Fallback)
+    url3 = f"https://code.openxlab.org.cn/api/v1/models/SG_161222/Realistic_Vision_V5.1_noVAE/realisticVisionV51.safetensors?nonce={nonce+2}"
+    file3 = "realisticVisionV51.safetensors"
+    if not os.path.exists(os.path.join(dest_dir, file3)):
+        download_with_aria2(url3, dest_dir, file3)
+    else:
+        print(f"✓ Already exists: {file3}")
 
 print("Models setup completed.")
 

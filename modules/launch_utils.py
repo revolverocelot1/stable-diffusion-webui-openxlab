@@ -415,7 +415,7 @@ def prepare_environment():
         (blip_repo, 'BLIP', "BLIP", blip_commit_hash)
     ]
     
-    for repo_url, repo_name, desc, commit_hash in repos_to_clone:
+    for repo_url, repo_name, desc, repo_commit_hash in repos_to_clone:
         target_dir = repo_dir(repo_name)
         
         # Check if repo exists in dependencies folder
@@ -425,7 +425,7 @@ def prepare_environment():
             import shutil
             shutil.copytree(deps_repo_path, target_dir)
         else:
-            git_clone(repo_url, target_dir, desc, commit_hash)
+            git_clone(repo_url, target_dir, desc, repo_commit_hash)
 
     startup_timer.record("clone repositores")
 
